@@ -119,6 +119,11 @@ $availableEquipmentResult = mysqli_query($con, $availableEquipmentQuery);
         <textarea id="Project_Description" class="form-control" rows="3"><?php echo htmlspecialchars($row['description']); ?></textarea>
     </div>
 
+    <div class="form-group mt-2">
+        <label>Total Cost</label>
+        <textarea id="Total_Cost" class="form-control" rows="3"><?php echo htmlspecialchars($row['total_cost']); ?></textarea>
+    </div>
+
     <!-- Assigned Service Requests -->
     <div class="form-group mt-3">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -302,7 +307,8 @@ $('#editProjectForm').on('submit', function(e) {
         end_date: $('#End_Date').val(),
         lead_engineer_id: $('#Lead_Engineer').val(),
         team_size: $('#Team_Size').val(),
-        description: $('#Project_Description').val()
+        description: $('#Project_Description').val(),
+        Total_Cost: $('#Total_Cost').val()
     };
     
     $.ajax({

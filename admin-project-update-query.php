@@ -9,7 +9,7 @@ $end_date = $_POST['end_date'];
 $lead_engineer_id = $_POST['lead_engineer_id'];
 $team_size = $_POST['team_size'];
 $description = mysqli_real_escape_string($con, $_POST['description']);
-
+$Total_Cost= $_POST['Total_Cost'];
 
  
 
@@ -21,7 +21,8 @@ $query = "UPDATE project SET
     end_date = '$end_date',
     lead_engineer_id = $lead_engineer_id,
     team_size = $team_size,
-    description = '$description'
+    description = '$description',
+    total_cost='$Total_Cost'
     WHERE project_id = $project_id";
 
 // Execute the query

@@ -4,6 +4,78 @@ include 'includes/connect.php';
 // Get status filter
 $status = isset($_POST['status']) ? mysqli_real_escape_string($con, $_POST['status']) : 'all';
 
+// ================= MAINTENANCE HISTORY TAB =================
+if ($status === 'history') {
+    $query = "SELECT 
+        e.equipment_id,
+        e.equipment_name,
+        e.equipment_type,
+        MAX(m.request_date) AS last_date,
+        COUNT(m.maintenance_id) AS total_maintenance
+    FROM equipment e
+    LEFT JOIN maintenance m ON e.equipment_id = m.equipment_id
+    GROUP BY e.equipment_id
+    ORDER BY total_maintenance DESC, e.equipment_id ASC";
+    
+    $result = mysqli_query($con, $query);
+    
+    if (!$result) {
+        echo "<div class='col-12 text-danger'>Query failed: " . mysqli_error($con) . "</div>";
+        mysqli_close($con);
+        exit;
+    }
+    
+    if (mysqli_num_rows($result) == 0) {
+        echo "<div class='col-12'><p class='text-center text-muted my-3'>No equipment found.</p></div>";
+    } else {
+        echo '<div class="table-responsive">
+                <table class="table table-striped table-hover" style="background: white; border-radius: 8px; overflow: hidden;">
+                    <thead style="background: #263a4f; color: white;">
+                        <tr>
+                            <th>Equipment ID</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Last Maintenance</th>
+                            <th>Total Maintenance</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+        
+        while ($row = mysqli_fetch_assoc($result)) {
+            $id = (int)$row['equipment_id'];
+            $name = htmlspecialchars($row['equipment_name']);
+            $type = htmlspecialchars($row['equipment_type']);
+            $lastDate = $row['last_date'] ? date("M d, Y", strtotime($row['last_date'])) : 'N/A';
+            $total = (int)$row['total_maintenance'];
+            
+            echo "<tr>
+                    <td>#EQ-{$id}</td>
+                    <td>{$name}</td>
+                    <td>{$type}</td>
+                    <td>{$lastDate}</td>
+                    <td><span style='background: #ff7607; color: white; padding: 4px 12px; border-radius: 12px; font-weight: 600;'>{$total}</span></td>
+                    <td>
+                        <button class='btn btn-sm btn-primary viewCostHistoryBtn' 
+                                data-id='{$id}' 
+                                data-name='{$name}'
+                                style='padding: 6px 12px; font-size: 13px;'>
+                            <i class='fas fa-dollar-sign'></i> View Costs
+                        </button>
+                    </td>
+                  </tr>";
+        }
+        
+        echo '      </tbody>
+                </table>
+              </div>';
+    }
+    
+    mysqli_close($con);
+    exit;
+}
+
+// ================= REGULAR EQUIPMENT TABS =================
 // Build query - JOIN with project and lead engineer to show who requested the equipment
 $query = "SELECT 
     equipment.*,

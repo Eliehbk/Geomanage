@@ -81,10 +81,7 @@ $isCompleted = !empty($data['maintenance_date']);
         <span><?php echo date("M d, Y", strtotime($data['request_date'])); ?></span>
     </div>
     
-    <div class="info-row">
-        <strong><i class="fas fa-wrench"></i> Maintenance Type:</strong>
-        <span><?php echo htmlspecialchars($data['maintenance_type'] ?? 'N/A'); ?></span>
-    </div>
+    
     
     <div class="info-row">
         <strong><i class="fas fa-comment"></i> Description:</strong>
@@ -92,6 +89,8 @@ $isCompleted = !empty($data['maintenance_date']);
             <?php echo htmlspecialchars($data['description'] ?? 'No description provided'); ?>
         </div>
     </div>
+
+    
 
     <?php if ($isCompleted): ?>
         <!-- Show completed maintenance details -->
@@ -135,6 +134,15 @@ $isCompleted = !empty($data['maintenance_date']);
             </h5>
 
             <div class="form-group" style="margin-bottom: 15px;">
+                <label for="maintenanceType" style="font-weight: 600; display: block; margin-bottom: 8px; color: #263a4f;">
+                    <i class="fas fa-edit"></i> Maintenance Type:
+                </label>
+                <textarea id="maintenanceType" class="form-control" rows="3" 
+                        placeholder="e.g., Calibration, Repair, Battery Replacement..." 
+                        style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;"></textarea>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 15px;">
                 <label style="font-weight: 600; display: block; margin-bottom: 5px; color: #263a4f;">
                     <i class="fas fa-dollar-sign"></i> Total Cost (Optional)
                 </label>
@@ -145,7 +153,7 @@ $isCompleted = !empty($data['maintenance_date']);
                        min="0" 
                        placeholder="0.00"
                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                <small style="color: #666; font-size: 12px;">Enter the total cost for parts, labor, or services if any</small>
+                <small style="color: #666; font-size: 12px;">Cost of Materials</small>
             </div>
 
             <div class="form-group" style="margin-bottom: 15px;">

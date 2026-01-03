@@ -37,8 +37,8 @@ while ($row = mysqli_fetch_assoc($result)) {
     <div class="container">
         <div class="row d-flex align-items-center">
             <div class="col-lg-8">
-                <h1>Equipment Maintenance</h1>
-                <p>Request maintenance and track equipment status</p>
+                <h1>Equipment Management</h1>
+                <p>Report issues and manage equipment requests</p>
             </div>
             <div class="col-lg-4 text-right">
                 <div class="engineer-info">
@@ -51,44 +51,60 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 <section class="padding">
     <div class="container">
+        <!-- Tab Navigation -->
         <div class="row">
-            <!-- Assigned Equipment -->
-            <div class="col-lg-6 padding-10">
-                <div class="service-item box-shadow" style="padding: 20px;">
-                    <h4 class="mb-3">Currently Assigned Equipment</h4>
-                    
-                    <div class="equipment-list" id="equipmentList">
-                        <!-- Equipment will be loaded here via AJAX -->
-                    </div>
+            <div class="col-12">
+                <div class="tab-navigation mb-40">
+                    <button class="tab-btn active" data-status="assigned">
+                        <i class="fas fa-tools"></i> Assigned Equipment
+                    </button>
+                    <button class="tab-btn" data-status="requested">
+                        <i class="fas fa-box"></i> Requested Equipment
+                    </button>
                 </div>
             </div>
+        </div>
 
-            
+        <div class="row">
+            <div class="col-12">
+                <div id="equipmentTable"></div>
+            </div>
         </div>
     </div>
 </section>
 
 <script>
 // 🔹 Load equipment via AJAX
-function loadEquipment() {
+function loadEquipment(status = 'assigned') {
     $.ajax({
         url: 'lead_eng-equipment-show-ajax.php',
         type: 'POST',
+        data: { 
+            status: status,
+            lead_engineer_id: '<?php echo $lead_engineer_id; ?>'
+        },
         success: function(response) {
-            $('#equipmentList').html(response);
+            $('#equipmentTable').html(response);
             console.log("Equipment loaded successfully");
         },
         error: function(xhr, status, error) {
             console.error('Error loading equipment:', error);
-            $('#equipmentList').html(
-                '<div class="text-center p-4 text-danger">Error loading equipment.</div>'
+            $('#equipmentTable').html(
+                '<div class="col-12"><p class="text-center text-danger p-3">Error loading equipment.</p></div>'
             );
         }
     });
 }
 
+// 🔹 Tab Navigation
+$(document).on('click', '.tab-btn', function() {
+    $('.tab-btn').removeClass('active');
+    $(this).addClass('active');
+    const status = $(this).data('status');
+    loadEquipment(status);
+});
+
 // 🔹 Request maintenance modal
-// Delegated event handler for dynamically loaded buttons
 $(document).on('click', '.report-issue-btn', function() {
     var id = $(this).data('id');
     var name = $(this).data('name');
@@ -100,14 +116,39 @@ $(document).on('click', '.report-issue-btn', function() {
     openModal('maintenanceRequestModal');
 });
 
-// SCHEDULE MAINTENANCE (FIXED)
+// 🔹 Remove equipment request
+$(document).on('click', '.removeEquipmentBtn', function() {
+    var equipmentId = $(this).data('equipment-id');
+    var projectId = $(this).data('project-id');
+    
+    if (!confirm('Are you sure you want to remove this equipment request?')) {
+        return;
+    }
+    
+    $.ajax({
+        url: 'admin-project-remove-equipment.php',
+        type: 'POST',
+        data: {
+            equipment_id: equipmentId,
+            project_id: projectId
+        },
+        success: function(response) {
+            alert(response);
+            loadEquipment('requested'); // Reload the requested tab
+        },
+        error: function(xhr, status, error) {
+            alert('Error removing equipment: ' + error);
+        }
+    });
+});
+
+// SCHEDULE MAINTENANCE
 function scheduleMaintenanceCurrent() {
-    // Get the equipment ID from the hidden input in the form
     const equipmentId = $('#maintenanceEquipmentId').val();
     const maintenanceType = $('#maintenanceType').val().trim();
     const maintenanceDescription = $('#maintenanceDescription').val().trim();
 
-    console.log('Equipment ID:', equipmentId); // Debug
+    console.log('Equipment ID:', equipmentId);
 
     if (!equipmentId) {
         alert('Equipment ID is missing. Please try again.');
@@ -133,21 +174,20 @@ function scheduleMaintenanceCurrent() {
         type: 'POST',
         data: {
             equipment_id: equipmentId,
-            maintenance_type: maintenanceType,
+            
             maintenance_description: maintenanceDescription
         },
         success: function (response) {
-            console.log('Response:', response); // Debug
+            console.log('Response:', response);
             if (response.toLowerCase().includes("successfully")) {
                 alert('Success: ' + response);
                 closeModal('maintenanceRequestModal');
 
-                // Clear form
                 $('#maintenanceType').val('');
                 $('#maintenanceDescription').val('');
 
                 setTimeout(() => {
-                    loadEquipment();
+                    loadEquipment('assigned');
                 }, 500);
             } else {
                 alert("Error: " + response);
@@ -160,38 +200,9 @@ function scheduleMaintenanceCurrent() {
     });
 }
 
-/*
-// 🔹 Submit equipment request via AJAX
-$(document).on('submit', '#equipmentRequestForm', function(e) {
-    e.preventDefault();
-    
-    var formData = $(this).serialize();
-    
-    $.ajax({
-        url: 'lead_eng-equipment-submit-request.php',
-        type: 'POST',
-        data: formData,
-        success: function(response) {
-            console.log("Response:", response);
-            
-            $('#successDetails').text(response);
-            openModal('successModal');
-            
-            $('#equipmentRequestForm')[0].reset();
-            
-            setTimeout(function() {
-                closeModal('successModal');
-            }, 2000);
-        },
-        error: function(xhr, status, error) {
-            alert('Error submitting equipment request: ' + error);
-        }
-    });
-});   */
-
 // 🔹 Initialize on page load
 $(document).ready(function() {
-    loadEquipment();
+    loadEquipment('assigned');
     initializeModalFunctions();
 });
 
@@ -244,28 +255,21 @@ function initializeModalFunctions() {
                 <div class="form-group">
                     <label>Equipment</label>
                     <input type="text" class="form-control" id="maintenanceEquipment" readonly>
-                    <input type="hidden" name="equipment_id" id="maintenanceEquipmentId" >
+                    <input type="hidden" name="equipment_id" id="maintenanceEquipmentId">
                 </div>
 
+                
+
                 <div class="form-group">
-                <label for="maintenanceType" style="font-weight: 600; display: block; margin-bottom: 8px; color: #263a4f;">
-                    <i class="fas fa-edit"></i> New Maintenance Type:
-                </label>
-                <textarea id="maintenanceType" class="form-control" rows="4" 
-                          placeholder="Add maintenance type..." 
-                          style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;"></textarea>
-                </div>
-                <div class="form-group">
-                <label for="maintenanceDescription" style="font-weight: 600; display: block; margin-bottom: 8px; color: #263a4f;">
-                    <i class="fas fa-edit"></i> Description:
-                </label>
-                <textarea id="maintenanceDescription" class="form-control" rows="4" 
-                          placeholder="Add maintenance description..." 
-                          style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;"></textarea>
+                    <label for="maintenanceDescription" style="font-weight: 600; display: block; margin-bottom: 8px; color: #263a4f;">
+                        <i class="fas fa-edit"></i> Description:
+                    </label>
+                    <textarea id="maintenanceDescription" class="form-control" rows="4" 
+                              placeholder="Add maintenance description..." 
+                              style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;"></textarea>
                 </div>
   
                 <div class="form-group text-right" style="gap:10px; display:flex; justify-content:flex-end;">
-                    <!-- Action Buttons -->
                     <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
                         <button type="button" class="btn btn-secondary" 
                                 style="padding: 10px 20px; border-radius: 5px;" 
@@ -273,13 +277,11 @@ function initializeModalFunctions() {
                             <i class="fas fa-times"></i> Close
                         </button>
 
-                         
                         <button type="button" class="btn btn-warning" 
                                 style="background: #ff7607; padding: 10px 20px; border-radius: 5px; color: #fff; border: none;" 
                                 onclick="scheduleMaintenanceCurrent()">
                             <i class="fas fa-wrench"></i> Schedule Maintenance
                         </button>
-                         
                     </div>
                 </div>
             </form>
@@ -300,6 +302,39 @@ function initializeModalFunctions() {
 </div>
 
 <style>
+/* Tab Navigation Styling */
+.tab-navigation {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    padding: 12px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+    border-color: #ff7607;
+    color: #ff7607;
+}
+
+.tab-btn.active {
+    background: #ff7607;
+    border-color: #ff7607;
+    color: #fff;
+}
+
+.tab-btn i {
+    margin-right: 8px;
+}
+
 .land-modal {
     display: none;
     position: fixed;
@@ -308,6 +343,7 @@ function initializeModalFunctions() {
     z-index: 9999;
     overflow-y: auto;
 }
+
 .land-modal-content {
     background: #fff;
     margin: 50px auto;
@@ -317,15 +353,18 @@ function initializeModalFunctions() {
     width: 90%;
     position: relative;
 }
+
 .land-modal-header {
     padding-bottom: 15px;
     border-bottom: 1px solid #ddd;
     margin-bottom: 20px;
 }
+
 .land-modal-header h3 {
     margin: 0;
     color: #263a4f;
 }
+
 .land-modal-close {
     cursor: pointer;
     font-size: 24px;
@@ -334,18 +373,22 @@ function initializeModalFunctions() {
     right: 20px;
     color: #666;
 }
+
 .land-modal-close:hover {
     color: #000;
 }
+
 .form-group {
     margin-bottom: 15px;
 }
+
 .form-group label {
     display: block;
     font-weight: 600;
     margin-bottom: 5px;
     color: #263a4f;
 }
+
 .form-control {
     width: 100%;
     padding: 10px 15px;
@@ -355,11 +398,13 @@ function initializeModalFunctions() {
     transition: border-color 0.3s, box-shadow 0.3s;
     box-sizing: border-box;
 }
+
 .form-control:focus {
     outline: none;
     border-color: #ff7607;
     box-shadow: 0 0 0 3px rgba(255, 118, 7, 0.1);
 }
+
 .default-btn {
     background: #ff7607;
     color: white;
@@ -371,11 +416,13 @@ function initializeModalFunctions() {
     cursor: pointer;
     transition: all 0.3s ease;
 }
+
 .default-btn:hover {
     background: #e66806;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 118, 7, 0.3);
 }
+
 .dl-btn {
     background: #263a4f;
     color: white;
@@ -385,6 +432,7 @@ function initializeModalFunctions() {
     cursor: pointer;
     transition: all 0.3s ease;
 }
+
 .dl-btn:hover {
     background: #1a2837;
 }

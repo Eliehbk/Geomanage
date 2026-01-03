@@ -1,4 +1,6 @@
 <?php
+ 
+
 include 'includes/header.php';
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== "Admin") {
     header("Location: ../no_access.php");
@@ -49,7 +51,10 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "Admin") {
                         <i class="fas fa-wrench"></i> Maintenance
                     </button>
                     <button class="tab-btn" data-status="Requested">
-                        <i class="fas fa-wrench"></i> Requests
+                        <i class="fas fa-clock"></i> Requests
+                    </button>
+                    <button class="tab-btn" data-status="history">
+                        <i class="fas fa-history"></i> Maintenance History
                     </button>
                 </div>
             </div>
@@ -73,6 +78,24 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "Admin") {
         </div>
         <div class="land-modal-body" id="equipmentDetailsModalBody">
             <p class="text-center">Loading...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Maintenance Cost History Modal -->
+<div id="maintenanceCostModal" class="land-modal" style="display: none;">
+    <div class="land-modal-content" style="max-width: 800px;">
+        <div class="land-modal-header">
+            <h3><i class="fas fa-dollar-sign"></i> Maintenance Cost History</h3>
+            <span class="land-modal-close" onclick="closeModal('maintenanceCostModal')">&times;</span>
+        </div>
+        <div class="land-modal-body" id="maintenanceCostModalBody">
+            <p class="text-center">Loading...</p>
+        </div>
+        <div class="land-modal-footer" style="padding: 20px; border-top: 1px solid #ddd; text-align: right;">
+            <button class="btn btn-secondary" onclick="closeModal('maintenanceCostModal')">
+                <i class="fas fa-times"></i> Close
+            </button>
         </div>
     </div>
 </div>
@@ -107,7 +130,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "Admin") {
         </div>
     </div>
 </div>
-
 
 <!-- Add Equipment Modal -->
 <div id="addEquipmentModal" class="land-modal" style="display: none;">
@@ -334,9 +356,7 @@ function loadEquipment(status = null) {
     });
 }
 
-
 // TAB NAVIGATION (STATUS FILTERS)
-
 $(document).on('click', '.tab-btn', function() {
     $('.tab-btn').removeClass('active');
     $(this).addClass('active');
@@ -344,9 +364,7 @@ $(document).on('click', '.tab-btn', function() {
     loadEquipment(status);
 });
 
-
 // MODAL FUNCTIONS
-
 function initializeModalFunctions() {
     window.openModal = function(modalId) {
         const modal = document.getElementById(modalId);
@@ -382,23 +400,18 @@ function initializeModalFunctions() {
     });
 }
 
-
 // OPEN EQUIPMENT DETAILS MODAL
-
 $(document).on('click', '.viewEquipmentDetailsBtn', function() {
     let equipmentId = $(this).data('id');
 
-    // Move modal to body if not already there
     if ($('#equipmentDetailsModal').parent()[0].tagName !== 'BODY') {
         $('#equipmentDetailsModal').appendTo('body');
     }
 
-    // Show modal with loading state
     $('#equipmentDetailsModal').fadeIn(300);
     $('body').css('overflow', 'hidden');
     $('#equipmentDetailsModalBody').html('<p class="text-center">Loading...</p>');
 
-    // Load equipment details via AJAX
     $.post('admin-equipment-fetch-details.php', { 
         equipment_id: equipmentId 
     }, function(data) {
@@ -408,10 +421,29 @@ $(document).on('click', '.viewEquipmentDetailsBtn', function() {
     });
 });
 
+// VIEW MAINTENANCE COST HISTORY
+$(document).on('click', '.viewCostHistoryBtn', function() {
+    let equipmentId = $(this).data('id');
+    let equipmentName = $(this).data('name');
 
-/// SCHEDULE MAINTENANCE (UPDATED)
+    openModal('maintenanceCostModal');
+    $('#maintenanceCostModalBody').html('<p class="text-center">Loading...</p>');
+
+    $.ajax({
+        url: 'admin-equipment-cost-history.php',
+        type: 'POST',
+        data: { equipment_id: equipmentId },
+        success: function(response) {
+            $('#maintenanceCostModalBody').html(response);
+        },
+        error: function() {
+            $('#maintenanceCostModalBody').html('<p class="text-danger">Error loading cost history.</p>');
+        }
+    });
+});
+
+// SCHEDULE MAINTENANCE
 function scheduleMaintenanceCurrent(equipmentId) {
-
     const maintenanceType = $('#maintenanceType').val().trim();
     const maintenanceDescription = $('#maintenanceDescription').val().trim();
 
@@ -434,7 +466,7 @@ function scheduleMaintenanceCurrent(equipmentId) {
         type: 'POST',
         data: {
             equipment_id: equipmentId,
-            maintenance_type: maintenanceType,
+            
             maintenance_description: maintenanceDescription
         },
         success: function (response) {
@@ -455,7 +487,6 @@ function scheduleMaintenanceCurrent(equipmentId) {
     });
 }
 
-
 // Approve equipment request
 $(document).on('click', '.approveRequestBtn', function() {
     var equipmentId = $(this).data('equipment-id');
@@ -464,9 +495,12 @@ $(document).on('click', '.approveRequestBtn', function() {
     var projectName = $(this).data('project-name');
     var leadName = $(this).data('lead-name');
     
-    if (!confirm('Approve equipment request?\n\nEquipment: ' + equipmentName + '\nProject: ' + projectName + '\nLead Engineer: ' + leadName)) {
+    if (!confirm('Approve equipment request?\n\nEquipment: ' + equipmentName + '\nProject: ' + projectName + '\nLead Engineer: ' + leadName + '\n\nAn approval email will be sent to the lead engineer.')) {
         return;
     }
+    
+    var $btn = $(this);
+    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
     
     $.ajax({
         url: 'admin-equipment-approve-request-query.php',
@@ -477,24 +511,21 @@ $(document).on('click', '.approveRequestBtn', function() {
         },
         success: function(response) {
             if (response.trim() === 'success') {
-                showSuccess('Request Approved', 'Equipment has been assigned to the project successfully!');
-                setTimeout(() => {
-                    loadEquipment();
-                }, 1500);
+                showSuccess('Request Approved', 'Equipment assigned successfully! Email notification sent to ' + leadName);
+                loadEquipment();
             } else {
                 alert('Error: ' + response);
+                $btn.prop('disabled', false).html('<i class="fas fa-check"></i> Approve');
             }
         },
         error: function() {
             alert('Error approving request. Please try again.');
+            $btn.prop('disabled', false).html('<i class="fas fa-check"></i> Approve');
         }
     });
 });
 
-
-// ============================================
 // RELOAD EQUIPMENT MODAL
-// ============================================
 function reloadEquipmentModal(equipmentId) {
     $.ajax({
         url: 'admin-equipment-fetch-details.php',
@@ -509,17 +540,17 @@ function reloadEquipmentModal(equipmentId) {
     });
 }
 
-
-
-
-// Unassign equipment
+// Reject equipment request
 $(document).on('click', '.unassignEquipmentBtn', function() {
-    if (!confirm('Are you sure you want to unassign this equipment?')) {
+    var equipmentId = $(this).data('equipment-id');
+    var projectId = $(this).data('project-id');
+    
+    if (!confirm('Are you sure you want to reject this equipment request?\n\nA rejection email will be sent to the lead engineer.')) {
         return;
     }
     
-    var equipmentId = $(this).data('equipment-id');
-    var projectId = $(this).data('project-id');
+    var $btn = $(this);
+    $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
     
     $.ajax({
         url: 'admin-equipment-reject-request-query.php',
@@ -530,11 +561,16 @@ $(document).on('click', '.unassignEquipmentBtn', function() {
         },
         success: function(response) {
             if (response.trim() === 'success') {
-                alert('Equipment unassigned successfully!');
-                loadEquipment(); // Reload the equipment list
+                showSuccess('Request Rejected', 'Equipment request declined. Email notification sent to the lead engineer.');
+                loadEquipment();
             } else {
                 alert('Error: ' + response);
+                $btn.prop('disabled', false).html('Reject');
             }
+        },
+        error: function() {
+            alert('Error rejecting request. Please try again.');
+            $btn.prop('disabled', false).html('Reject');
         }
     });
 });
@@ -546,7 +582,6 @@ $(document).on('click', '#addEquipmentBtn', function() {
 
 // Handle Add Equipment Form Submission
 $(document).on('click', '#confirmAddEquipmentBtn', function() {
-    // Get form data
     const equipmentName = $('#equipment_name').val().trim();
     const equipmentType = $('#equipment_type').val().trim();
     const serialNumber = $('#serial_number').val().trim();
@@ -555,13 +590,11 @@ $(document).on('click', '#confirmAddEquipmentBtn', function() {
     const date = $('#date').val().trim();
     const status = $('#status').val();
     
-    // Validate required fields
     if (!equipmentName || !equipmentType) {
         alert('Please fill in all required fields (Equipment Name and Type)');
         return;
     }
     
-    // Disable button to prevent double submission
     $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Adding...');
     
     $.ajax({
@@ -594,24 +627,19 @@ $(document).on('click', '#confirmAddEquipmentBtn', function() {
             alert('Error adding equipment. Please try again.');
         },
         complete: function() {
-            // Re-enable button
             $('#confirmAddEquipmentBtn').prop('disabled', false).html('<i class="fas fa-check"></i> Add Equipment');
         }
     });
 });
 
-// ============================================
 // SHOW SUCCESS MESSAGE
-// ============================================
 function showSuccess(message, details) {
     document.getElementById('successMessage').textContent = message;
     document.getElementById('successDetails').textContent = details;
     openModal('successModal');
 }
 
-// ============================================
 // INITIALIZE ON PAGE LOAD
-// ============================================
 $(document).ready(function() {
     initializeModalFunctions();
     loadEquipment('all');

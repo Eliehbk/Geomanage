@@ -9,6 +9,7 @@ $leadengineer = isset($_POST['leadengineer']) ? $_POST['leadengineer'] : '';
 $clientName = isset($_POST['clientName']) ? mysqli_real_escape_string($con, $_POST['clientName']) : '';
 
 // Base query with GROUP_CONCAT to combine multiple services and equipment
+$query = // Base query with GROUP_CONCAT to combine multiple services and equipment
 $query = "SELECT  
     project.project_id,
     project.status,
@@ -21,7 +22,11 @@ $query = "SELECT
     lead_user.full_name AS lead_name,
     client_user.full_name AS client_name,
     client_user.email AS client_email,
-	GROUP_CONCAT(DISTINCT land.land_address SEPARATOR ', ') AS land_address,
+    (SELECT sr2.request_id 
+     FROM service_request sr2 
+     WHERE sr2.project_id = project.project_id 
+     LIMIT 1) AS request_id,
+    GROUP_CONCAT(DISTINCT land.land_address SEPARATOR ', ') AS land_address,
     GROUP_CONCAT(DISTINCT land.land_number SEPARATOR ', ') AS land_numbers,
     GROUP_CONCAT(DISTINCT service.service_name SEPARATOR ', ') AS service_names,
     GROUP_CONCAT(DISTINCT equipment.equipment_name SEPARATOR ', ') AS equipment_names
@@ -51,7 +56,6 @@ LEFT JOIN land ON service_request.land_id=land.land_id
 
 WHERE project.status = '$status'
 ";
-
 // Apply filters
 if (!empty($projectName)) {
     $query .= " AND project.project_name LIKE '%$projectName%'";
@@ -116,7 +120,8 @@ if (mysqli_num_rows($result) == 0) {
         $progress= $row['progress'];
         $total_price= $row['total_cost'];
         $client_email= $row['client_email'];
-?>
+        $request_id=$row['request_id'];
+?>          
         <div class="col-lg-4 col-md-6 padding-10">
             <div class="service-item box-shadow" style="padding: 15px;">
                 <div class="service-content" style="padding: 0;">
@@ -190,6 +195,9 @@ if (mysqli_num_rows($result) == 0) {
                                 data-id="<?php echo $id; ?>">
                                 Manage
                             </button>
+                            <button type="button" class="btn btn-info viewMapBtn" data-request-id="<?php echo $request_id; ?>">
+                                <i class="fas fa-map-marked-alt"></i> View on Map
+                            </button>
 
                         <?php else: ?>
                             <!-- When completed show Done -->
@@ -215,6 +223,10 @@ if (mysqli_num_rows($result) == 0) {
                                 >
                                 
                                 Done
+                            </button>
+
+                            <button type="button" class="btn btn-info viewMapBtn" data-request-id="<?php echo $request_id; ?>">
+                                <i class="fas fa-map-marked-alt"></i> View on Map
                             </button>
  
                         <?php endif; ?>

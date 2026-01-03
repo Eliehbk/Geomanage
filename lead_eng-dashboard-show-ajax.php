@@ -27,8 +27,8 @@ $status = isset($_POST['status']) ? mysqli_real_escape_string($con, $_POST['stat
         // Build query - Join with client to get client name
         $query = "SELECT project.*, client.client_id, user.full_name as client_name
                   FROM project 
-                  LEFT JOIN includes_project_land ON project.project_id = includes_project_land.project_id
-                  LEFT JOIN client ON includes_project_land.client_id = client.client_id
+                  LEFT JOIN service_request on project.project_id = service_request.project_id
+                  JOIN client on service_request.client_id=client.client_id
                   LEFT JOIN user ON client.user_id = user.user_id
                   WHERE project.lead_engineer_id = $lead_engineer_id
                   AND project.status = '$status'";
@@ -63,12 +63,17 @@ $status = isset($_POST['status']) ? mysqli_real_escape_string($con, $_POST['stat
                 $service_query = "SELECT service_request.request_id, service.service_name
                                     FROM service_request
                                     JOIN service ON service_request.service_id = service.service_id
-                                 WHERE service_request.project_id = $project_id";
+                                WHERE service_request.project_id = $project_id";
                 $service_result = mysqli_query($con, $service_query);
                 $services = [];
+                $request_id = null; // Initialize request_id
                 if ($service_result) {
                     while ($service = mysqli_fetch_assoc($service_result)) {
                         $services[] = $service['service_name'];
+                        // Capture the first request_id for the map button
+                        if ($request_id === null) {
+                            $request_id = $service['request_id'];
+                        }
                     }
                 }
                 
@@ -156,6 +161,10 @@ $status = isset($_POST['status']) ? mysqli_real_escape_string($con, $_POST['stat
                             style="padding: 5px 10px; font-size: 12px; background: #ff9800; border: none; cursor: pointer;" 
                             data-id="<?php echo $project_id; ?>">
                             Details
+                            </button>
+
+                            <button type="button" class="btn btn-info viewMapBtn" data-request-id="<?php echo $request_id; ?>">
+                                <i class="fas fa-map-marked-alt"></i> View on Map
                             </button>
                             <?php if (strtolower($row['status']) === 'completed'): ?>
                             <!-- When completed show Done -->

@@ -7,7 +7,7 @@ include 'includes/connect.php';
 // Validate inputs
 if (
     !isset($_POST['equipment_id']) ||
-    !isset($_POST['maintenance_type']) ||
+    
     !isset($_POST['maintenance_description'])
 ) {
     echo "Missing required parameters";
@@ -24,7 +24,7 @@ $requester_id = (int)$_SESSION['user_id'];
 
 
 $equipment_id = (int)$_POST['equipment_id'];
-$maintenance_type = mysqli_real_escape_string($con, trim($_POST['maintenance_type']));
+
 $maintenance_description = mysqli_real_escape_string($con, trim($_POST['maintenance_description']));
 
 // Check equipment exists
@@ -47,8 +47,8 @@ mysqli_begin_transaction($con);
 try {
     // 1️⃣ Insert maintenance (date = CURDATE)
     $insertMaintenance = "
-        INSERT INTO maintenance (equipment_id, maintenance_type, description, request_date,requested_by)
-        VALUES ($equipment_id, '$maintenance_type', '$maintenance_description', CURDATE(),$requester_id)
+        INSERT INTO maintenance (equipment_id, description, request_date,requested_by)
+        VALUES ($equipment_id, '$maintenance_description', CURDATE(),$requester_id)
     ";
 
     if (!mysqli_query($con, $insertMaintenance)) {

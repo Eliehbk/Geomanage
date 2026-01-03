@@ -37,6 +37,7 @@ if (isset($_POST['submit'])) {
             $created_at = date('Y-m-d H:i:s');
 
             $insert = "INSERT INTO user (full_name, email, password, phone, role, created_at) 
+
                        VALUES ('$fullname', '$email', '$hashedPassword', '$phonenb','Client', '$created_at')";
 
             if (mysqli_query($con, $insert)) {

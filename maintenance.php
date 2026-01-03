@@ -4,68 +4,81 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "Maintenance_Technician")
     exit();
 }
 ?>
+<?php include 'includes/connect.php'; ?>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <!doctype html>
-<html lang="en">
+<html class="no-js" lang="en">
+<head>
+</head>
 <body>
+
+<section class="page-header padding bg-grey">
+<div class="container">
+    <div>
+        <div class="col-lg-8">
+            <h1>Equipment Maintenance</h1>
+            <p>Manage maintenance requests and equipment status</p>
+        </div>
+    </div>
+</div>
+</section>
 
 <section class="padding">
 <div class="container">
+    <!-- ================= MAINTENANCE REQUESTS ================= -->
+    <div class="service-item box-shadow mb-5 p-4">
+        <h3>Maintenance Requests</h3>
 
-<!-- ================= MAINTENANCE REQUESTS ================= -->
-<div class="service-item box-shadow mb-5 p-4">
-    <h3>Maintenance Requests</h3>
+        <input type="text" id="maintenanceSearch" class="form-control mb-3"
+            placeholder="Search maintenance..." onkeyup="loadMaintenanceRequests()">
 
-    <input type="text" id="maintenanceSearch" class="form-control mb-3"
-           placeholder="Search maintenance..." onkeyup="loadMaintenanceRequests()">
-
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Request ID</th>
-                    <th>Equipment</th>
-                    <th>Requested By</th>
-                    <th>Date</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="maintenanceBody">
-                <tr>
-                    <td colspan="5" class="text-center">Loading...</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Request ID</th>
+                        <th>Equipment</th>
+                        <th>Requested By</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="maintenanceBody">
+                    <tr>
+                        <td colspan="5" class="text-center">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 
-<!-- ================= EQUIPMENT HISTORY ================= -->
-<div class="service-item box-shadow p-4">
-    <h3>Equipment Maintenance History</h3>
+    <!-- ================= EQUIPMENT HISTORY ================= -->
+    <div class="service-item box-shadow p-4">
+        <h3>Equipment Maintenance History</h3>
 
-    <input type="text" id="historySearch" class="form-control mb-3"
-           placeholder="Search equipment..." onkeyup="loadEquipmentHistory()">
+        <input type="text" id="historySearch" class="form-control mb-3"
+            placeholder="Search equipment..." onkeyup="loadEquipmentHistory()">
 
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Equipment ID</th>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Last Maintenance</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody id="historyBody">
-                <tr>
-                    <td colspan="5" class="text-center">Loading...</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Equipment ID</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Last Maintenance</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody">
+                    <tr>
+                        <td colspan="5" class="text-center">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
-
 </div>
 </section>
 
@@ -89,10 +102,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "Maintenance_Technician")
         </div>
     </div>
 </div>
-
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 
 <script>
 /* ================= MODAL FUNCTIONS ================= */
@@ -191,6 +200,9 @@ $(document).on('click', '#completeMaintenanceBtn', function() {
     if (cost && parseFloat(cost) > 0) {
         formData.append('total_cost', cost);
     }
+
+    var maintenanceType=$('#maintenanceType').val();
+    formData.append('maintenanceType', maintenanceType.trim());
     
     // Add bill file if uploaded (optional)
     var billFile = $('#billUpload')[0].files[0];

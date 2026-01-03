@@ -1496,6 +1496,8 @@ function showErrorNotification(message) {
     });
 }
 
+
+
 /* ========================================
    KEYBOARD SHORTCUTS
 ======================================== */
@@ -1507,6 +1509,21 @@ $(document).on('keydown', function(e) {
             closeModal($(this).attr('id'));
         });
     }
+});
+
+
+// View on Map button handler
+$(document).on('click', '.viewMapBtn', function() {
+    const requestId = $(this).data('request-id');
+    
+    if (!requestId) {
+        alert('Request ID not available.');
+        return;
+    }
+    
+    // Open admin map viewer with request_id
+    const mapUrl = `admin-map-viewer.php?request_id=${requestId}`;
+    window.open(mapUrl, 'MapView', 'width=1200,height=800,scrollbars=yes,resizable=yes');
 });
 
 /* ========================================

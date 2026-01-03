@@ -61,16 +61,25 @@ $isCompleted = !empty($maintenance_date);
 // ============================================
 $assignmentQuery = "
     SELECT 
-        project.project_id,
-        project.project_name,
-        land.land_id,
-        land.land_address,
-        land.land_number
-    FROM uses_project_equipment
-    JOIN project ON project.project_id = uses_project_equipment.project_id
-    LEFT JOIN includes_project_land ON includes_project_land.project_id = project.project_id
-    LEFT JOIN land ON land.land_id = includes_project_land.land_id
-    WHERE uses_project_equipment.equipment_id = $equipment_id
+                e.equipment_name,
+                e.equipment_type,
+                e.model,
+                e.serial_number,
+                p.project_name,
+                p.project_id,
+                land.land_id,
+                land.land_address,
+                land.land_number,
+                u.email AS lead_email,
+                u.full_name AS lead_name
+            FROM equipment e
+            JOIN uses_project_equipment upe ON e.equipment_id = upe.equipment_id
+            JOIN project p ON upe.project_id = p.project_id
+            JOIN includes_project_land on includes_project_land.project_id=p.project_id
+            JOIN land on land.land_id=includes_project_land.land_id
+            JOIN lead_engineer le ON p.lead_engineer_id = le.lead_engineer_id
+            JOIN user u ON le.user_id = u.user_id
+    WHERE upe.equipment_id = $equipment_id
 ";
 
 $assignmentResult = mysqli_query($con, $assignmentQuery);
@@ -265,14 +274,7 @@ $hasAssignments = ($assignmentResult && mysqli_num_rows($assignmentResult) > 0);
                     <i class="fas fa-tools"></i> Schedule New Maintenance
                 </h6>
                 
-                <div class="form-group" style="margin-bottom: 15px;">
-                    <label for="maintenanceType" style="font-weight: 600; display: block; margin-bottom: 8px; color: #263a4f;">
-                        <i class="fas fa-edit"></i> Maintenance Type:
-                    </label>
-                    <textarea id="maintenanceType" class="form-control" rows="3" 
-                              placeholder="e.g., Calibration, Repair, Battery Replacement..." 
-                              style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;"></textarea>
-                </div>
+                
                 
                 <div class="form-group">
                     <label for="maintenanceDescription" style="font-weight: 600; display: block; margin-bottom: 8px; color: #263a4f;">

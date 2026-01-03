@@ -107,6 +107,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "Admin") {
     </div>
 </section>
 
+
 <!-- Response Modal -->
 <div class="modal fade" id="respondModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
@@ -129,7 +130,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "Admin") {
         <!-- Admin Form -->
         <div class="response-form-section">
 
-
           <div class="mb-3">
             <label for="requestPrice" class="form-label">Price (USD)</label>
             <input type="number" class="form-control" id="requestPrice" placeholder="Enter price" min="0" step="0.01" required>
@@ -137,7 +137,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "Admin") {
 
           <div class="mb-3">
             <label for="rejectionReason" class="form-label">Rejection reason</label>
-            <input type="text" class="form-control" id="rejectionReason"  min="0" step="0.01" >
+            <input type="text" class="form-control" id="rejectionReason" min="0" step="0.01">
           </div>
         </div>
 
@@ -145,12 +145,19 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "Admin") {
 
       <!-- Modal Footer -->
       <div class="modal-footer d-flex justify-content-between">
-        <button type="button" class="btn btn-danger" id="denyRequest">
-          <i class="fas fa-times"></i> Deny Request
-        </button>
-        <button type="button" class="btn btn-success" id="approveRequest">
-          <i class="fas fa-check"></i> Approve Request
-        </button>
+        <div>
+          <button type="button" class="btn btn-info" id="viewMapBtn">
+            <i class="fas fa-map-marked-alt"></i> View on Map
+          </button>
+        </div>
+        <div>
+          <button type="button" class="btn btn-danger" id="denyRequest">
+            <i class="fas fa-times"></i> Deny Request
+          </button>
+          <button type="button" class="btn btn-success" id="approveRequest">
+            <i class="fas fa-check"></i> Approve Request
+          </button>
+        </div>
       </div>
 
     </div>
@@ -715,7 +722,37 @@ $(document).on('click', '#saveNewServiceBtn', function() {
     });
 });
 
+// Store current request ID
+ 
 
+$(document).on('click', '.respond-btn', function() {
+    currentRequestId = $(this).data('id');   
+    $('#respondModal').modal('show');
+
+    // Clear previous input
+    $('#requestPrice').val('');
+    $('#rejectionReason').val('');
+
+    $('#landDetails').html('<p>Loading...</p>');  
+
+    $.post('admin-services-fetch-land-info.php', { request_id: currentRequestId }, function(response) {
+        $('#landDetails').html(response);
+    }).fail(function() {
+        $('#landDetails').html('<p class="text-danger">Failed to load land info.</p>');
+    });
+});
+
+// View on Map button handler
+$(document).on('click', '#viewMapBtn', function() {
+    if (!currentRequestId) {
+        alert('Request ID not available.');
+        return;
+    }
+    
+    // Open admin map viewer with request_id - it will fetch coordinates from database
+    const mapUrl = `admin-map-viewer.php?request_id=${currentRequestId}`;
+    window.open(mapUrl, 'MapView', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+});
 
 
 </script>

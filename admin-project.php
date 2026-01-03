@@ -623,7 +623,10 @@ $(document).on('click', '.viewMapBtn', function() {
                             LEFT JOIN project p ON p.project_id = sr.project_id
                             WHERE sr.status = 'approved'
                             AND sr.project_id IS NULL
+
                             ORDER BY land.land_id, sr.approval_status DESC;
+              
+
                             ";
                     
                     $result = mysqli_query($con, $sql);
@@ -999,6 +1002,7 @@ select[name="Lead_Engineer"] option[value=""] {
     }
 }
 
+
 /* ========================================
    UNIFIED TAB NAVIGATION STYLES
    Replace the tab styles in admin-project.php with these
@@ -1054,6 +1058,9 @@ select[name="Lead_Engineer"] option[value=""] {
 .tab-btn.active::after {
     transform: scaleX(1);
 }
+
+
+
 
 </style>
 <?php 

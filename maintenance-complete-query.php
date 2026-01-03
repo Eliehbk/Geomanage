@@ -11,8 +11,13 @@ if (!isset($_POST['maintenance_id'])) {
     echo "Missing maintenance ID";
     exit();
 }
+if (!isset($_POST['maintenanceType'])) {
+    echo "Missing maintenance ID";
+    exit();
+}
 
 $maintenance_id = (int)$_POST['maintenance_id'];
+$maintenanceType=$_POST['maintenanceType'];
 
 // Handle total cost - can be empty
 $total_cost = null;
@@ -90,6 +95,15 @@ try {
         $updateMaintenance .= ", bill_file_path = '$bill_filename_escaped'";
     }
     
+
+    // Add maintenance_type if provided
+    if ($maintenanceType !== null && $maintenanceType !== '') {
+        // Escape string to be safe
+        $maintenanceTypeSafe = mysqli_real_escape_string($con, $maintenanceType);
+        $updateMaintenance .= ", maintenance_type = '$maintenanceTypeSafe'";
+    }
+
+
     $updateMaintenance .= " WHERE maintenance_id = $maintenance_id";
     
     if (!mysqli_query($con, $updateMaintenance)) {

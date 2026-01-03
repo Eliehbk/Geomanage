@@ -51,13 +51,21 @@ if ($status === 'services') {
 
 
 // Base query
-$query = "SELECT s.service_id,sr.request_id, u.full_name AS client_name, s.service_name, 
-                 sr.request_date, sr.STATUS, c.client_id
-          FROM service_request sr
-          JOIN client c ON sr.client_id = c.client_id
-          JOIN user u ON c.user_id = u.user_id
-          JOIN service s ON sr.service_id = s.service_id
-          WHERE sr.STATUS = '$status'";
+$query = "SELECT 
+    s.service_id,
+    sr.request_id,
+    u.full_name AS client_name,
+    s.service_name,
+    sr.request_date,
+    sr.STATUS,
+    c.client_id,
+    sr.project_id
+FROM service_request sr
+LEFT JOIN client c ON sr.client_id = c.client_id
+JOIN user u ON c.user_id = u.user_id
+JOIN service s ON sr.service_id = s.service_id
+WHERE sr.STATUS = '$status' 
+  AND sr.project_id IS NULL";
 
 // Apply filters
 if (!empty($clientName)) {
@@ -95,15 +103,19 @@ if ($result) {
     } else {
         echo '<div class="row">';
         while ($row = mysqli_fetch_assoc($result)) {
-            $id = $row['request_id'];
-            $client = htmlspecialchars($row['client_name']);
-            $service = htmlspecialchars($row['service_name']);
-            $date = date("M d, Y", strtotime($row['request_date']));
-            $clientId = $row['client_id'];
+        // Trim STATUS to remove any whitespace
+        $row['STATUS'] = trim($row['STATUS']);
+        
+        echo "<!-- DEBUG: request_id=".$row['request_id']." STATUS='".$row['STATUS']."' strtolower='".strtolower($row['STATUS'])."' -->";
+        $id = $row['request_id'];
+        $client = htmlspecialchars($row['client_name']);
+        $service = htmlspecialchars($row['service_name']);
+        $date = date("M d, Y", strtotime($row['request_date']));
+        $clientId = $row['client_id'];
 
-            // Determine status badge class
-            $statusClass = 'status-' . strtolower($row['STATUS']);
-?>
+        // Determine status badge class
+        $statusClass = 'status-' . strtolower($row['STATUS']);
+    ?>
 <div class="col-lg-6 mb-3">
     <div class="card p-3 request-card">
         <div class="d-flex justify-content-between mb-2 align-items-start">
@@ -116,14 +128,17 @@ if ($result) {
         <p><strong>Service:</strong> <?php echo $service; ?></p>
         <p><strong>Date:</strong> <?php echo $date; ?></p>
 
-        <?php if (strtolower($row['STATUS']) === 'pending'): ?>
-        <button type="button" class="btn  btn-primary btn-sm respond-btn" 
+        <?php 
+        $statusLower = strtolower($row['STATUS']);
+        echo "<!-- Button check: status='$statusLower' condition=".($statusLower === 'pending' ? 'true' : 'false')." -->";
+        if ($statusLower === 'pending'): 
+        ?>
+        <button type="button" class="btn btn-primary btn-sm respond-btn" 
                 data-id="<?php echo $id; ?>" 
                 data-client-id="<?php echo $clientId; ?>">
             Respond
         </button>
         <?php endif; ?>
-
         <?php if (strtolower($row['STATUS']) === 'rejected'): ?>
         <button type="button" class="btn  btn-primary btn-sm viewReasonBtn" 
                 data-id="<?php echo $id; ?>" 
