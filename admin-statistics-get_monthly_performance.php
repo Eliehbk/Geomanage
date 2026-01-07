@@ -131,8 +131,7 @@ for($i = 1; $i <= 12; $i++) {
     ];
 }
 
-// Reverse to show most recent first
-$months = array_reverse($months);
+
 
 echo json_encode($months);
 ?>
