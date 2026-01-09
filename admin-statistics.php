@@ -219,8 +219,8 @@ $revenueData = mysqli_fetch_all($result, MYSQLI_ASSOC);
                                 labels: data.labels,
                                 datasets: [
                                     {
-                                        label: 'Service Requests',
-                                        data: data.service_request_revenue,
+                                        label: 'Projects',
+                                        data: data.project_revenue,
                                         backgroundColor: '#36A2EB',
                                         borderColor: '#36A2EB',
                                         borderWidth: 1

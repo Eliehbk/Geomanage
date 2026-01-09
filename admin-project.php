@@ -60,16 +60,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $request_id = (int)$request_id; // Cast to int for safety
             
             // Get the land_id for this service request
-            $landQuery = "SELECT land_id FROM service_request WHERE request_id = $request_id";
+           // Get client_id from service_request
+        $landQuery = "SELECT sr.land_id, sr.client_id 
+                    FROM service_request sr 
+                    WHERE sr.request_id = $request_id";
             $landResult = mysqli_query($con, $landQuery);
             
             if ($landResult && $landRow = mysqli_fetch_assoc($landResult)) {
                 $land_id = (int)$landRow['land_id'];
+            $client_id = (int)$landRow['client_id'];
                 
                 // Add to includes_project_land table (only if not already added)
                 if (!in_array($land_id, $processedLands)) {
-                    $insertLandProject = "INSERT INTO includes_project_land (project_id, land_id) 
-                                         VALUES ($projectId, $land_id)";
+                $insertLandProject = "INSERT INTO includes_project_land (project_id, land_id, client_id) 
+                                    VALUES ($projectId, $land_id, $client_id)";
                     mysqli_query($con, $insertLandProject);
                     
                     // Mark this land as processed
@@ -641,6 +645,7 @@ $(document).on('click', '.viewMapBtn', function() {
                 <div class="approved-requests-list">
                     <?php 
                     $sql = "SELECT 
+                          
                                 sr.request_id,
                                 sr.status,
                                 sr.approval_status,
@@ -657,8 +662,7 @@ $(document).on('click', '.viewMapBtn', function() {
                             LEFT JOIN project p ON p.project_id = sr.project_id
                             WHERE sr.status = 'approved'
                             AND sr.project_id IS NULL
-
-                            ORDER BY land.land_id, sr.approval_status DESC;
+                            ORDER BY u.full_name ASC, sr.approval_status DESC;
               
 
                             ";

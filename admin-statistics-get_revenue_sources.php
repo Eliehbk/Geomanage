@@ -23,15 +23,15 @@ if($year < 2000 || $year > $currentYear + 1) {
     $year = $currentYear;
 }
 
-// Get revenue from Service Requests by month for selected year
-$sqlServiceRequests = "SELECT 
-                        DATE_FORMAT(sr.request_date, '%Y-%m') as month,
-                        SUM(sr.price) as revenue
-                    FROM service_request sr
-                    WHERE sr.status = 'approved'
-                        AND YEAR(sr.request_date) = $year
-                    GROUP BY DATE_FORMAT(sr.request_date, '%Y-%m')
-                    ORDER BY month";
+// Get revenue from Projects by month for selected year
+$sqlProjects = "SELECT 
+                    DATE_FORMAT(p.start_date, '%Y-%m') as month,
+                    SUM(p.total_cost) as revenue
+                FROM project p
+                WHERE p.status = 'don'
+                    AND YEAR(p.start_date) = $year
+                GROUP BY DATE_FORMAT(p.start_date, '%Y-%m')
+                ORDER BY month";
 
 // Get revenue from Land Listings by month for selected year
 $sqlLandListings = "SELECT 
@@ -43,18 +43,18 @@ $sqlLandListings = "SELECT
                     ORDER BY month";
 
 // Execute queries
-$resultSR = mysqli_query($con, $sqlServiceRequests);
+$resultProjects = mysqli_query($con, $sqlProjects);
 $resultLL = mysqli_query($con, $sqlLandListings);
 
 // Collect data
-$serviceRequestData = [];
+$projectData = [];
 $landListingData = [];
 
-// Process Service Request data
-if($resultSR){
-    while($row = mysqli_fetch_assoc($resultSR)){
+// Process Project data
+if($resultProjects){
+    while($row = mysqli_fetch_assoc($resultProjects)){
         $month = $row['month'];
-        $serviceRequestData[$month] = (float)$row['revenue'];
+        $projectData[$month] = (float)$row['revenue'];
     }
 }
 
@@ -74,7 +74,7 @@ for($m = 1; $m <= 12; $m++){
 
 // Prepare final arrays with 0 for missing months
 $labels = [];
-$serviceRequestRevenue = [];
+$projectRevenue = [];
 $landListingRevenue = [];
 
 foreach($allMonths as $month){
@@ -82,14 +82,14 @@ foreach($allMonths as $month){
     $date = DateTime::createFromFormat('Y-m', $month);
     $labels[] = $date->format('M');
     
-    $serviceRequestRevenue[] = isset($serviceRequestData[$month]) ? $serviceRequestData[$month] : 0;
+    $projectRevenue[] = isset($projectData[$month]) ? $projectData[$month] : 0;
     $landListingRevenue[] = isset($landListingData[$month]) ? $landListingData[$month] : 0;
 }
 
 // Output JSON
 echo json_encode([
     'labels' => $labels,
-    'service_request_revenue' => $serviceRequestRevenue,
+    'project_revenue' => $projectRevenue,
     'land_listing_revenue' => $landListingRevenue,
     'year' => $year
 ]);

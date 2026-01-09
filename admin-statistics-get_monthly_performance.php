@@ -8,15 +8,15 @@ $year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
 // GET REVENUE FROM ALL SOURCES
 // ============================================
 
-// Get monthly revenue from service requests
+// Get monthly revenue from projects
 $revenueQuery = "
     SELECT 
-        DATE_FORMAT(request_date, '%Y-%m') as month,
-        SUM(price) as revenue
-    FROM service_request
-    WHERE status = 'approved' 
-        AND YEAR(request_date) = $year
-    GROUP BY DATE_FORMAT(request_date, '%Y-%m')
+        DATE_FORMAT(start_date, '%Y-%m') as month,
+        SUM(total_cost) as revenue
+    FROM project
+    WHERE status = 'don' 
+        AND YEAR(start_date) = $year
+    GROUP BY DATE_FORMAT(start_date, '%Y-%m')
 ";
 
 $revenueResult = mysqli_query($con, $revenueQuery);
@@ -70,23 +70,29 @@ while($row = mysqli_fetch_assoc($maintenanceResult)) {
     $expensesData[$month] += floatval($row['amount']);
 }
 
-// 2. Get Salary expenses
-$salaryQuery = "
-    SELECT 
-        DATE_FORMAT(date_paid, '%Y-%m') as month,
-        SUM(amount) as amount
-    FROM salary_payment
-    WHERE YEAR(date_paid) = $year
-    GROUP BY DATE_FORMAT(date_paid, '%Y-%m')
-";
-
-$salaryResult = mysqli_query($con, $salaryQuery);
-while($row = mysqli_fetch_assoc($salaryResult)) {
-    $month = $row['month'];
-    if(!isset($expensesData[$month])) {
-        $expensesData[$month] = 0;
+// 2. Get Salary expenses from Contracts (for each month)
+for($i = 1; $i <= 12; $i++) {
+    $monthKey = sprintf("%d-%02d", $year, $i);
+    $month_start = $monthKey . '-01';
+    $month_end = date('Y-m-t', strtotime($month_start)); // Last day of month
+    
+    $salaryQuery = "
+        SELECT COALESCE(SUM(salary), 0) as total_salary
+        FROM contract
+        WHERE start_date <= '$month_end'
+          AND end_date >= '$month_start'
+    ";
+    
+    $salaryResult = mysqli_query($con, $salaryQuery);
+    $row = mysqli_fetch_assoc($salaryResult);
+    $salaryAmount = floatval($row['total_salary']);
+    
+    if($salaryAmount > 0) {
+        if(!isset($expensesData[$monthKey])) {
+            $expensesData[$monthKey] = 0;
+        }
+        $expensesData[$monthKey] += $salaryAmount;
     }
-    $expensesData[$month] += floatval($row['amount']);
 }
 
 // 3. Get Equipment expenses

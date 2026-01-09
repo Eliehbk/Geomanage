@@ -1176,8 +1176,8 @@ function openTeamModal(projectId) {
         $('#assignedSurveyors').html('<li style="text-align: center; color: #dc3545; padding: 20px;">Error loading surveyors</li>');
     });
 
-    // Load available surveyors
-    $.get('lead_eng-dashboard-get-available-surveyors.php', function(data) {
+    // Load available surveyors WITH project_id for team size check
+    $.post('lead_eng-dashboard-get-available-surveyors.php', { project_id: projectId }, function(data) {
         $('#availableSurveyorsList').html(data);
     }).fail(function() {
         $('#availableSurveyorsList').html('<p style="text-align: center; color: #dc3545; padding: 10px;">Error loading available surveyors</p>');
@@ -1195,27 +1195,100 @@ function reloadTeamModal(projectId) {
         $('#assignedSurveyors').html(data);
     });
     
-    $.get('lead_eng-dashboard-get-available-surveyors.php', function(data) {
+    // Reload with project_id for updated team size status
+    $.post('lead_eng-dashboard-get-available-surveyors.php', { project_id: projectId }, function(data) {
         $('#availableSurveyorsList').html(data);
     });
 }
 
+
 // Add single surveyor to project
 function addSingleSurveyor(surveyorId) {
     const projectId = $('#team_project_id').val();
+    const addButton = event.target.closest('button');
+    
+    // Disable button during processing
+    $(addButton).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Adding...');
     
     $.post('lead_eng-dashboard-add-surveyor-query.php', { 
         project_id: projectId, 
         surveyor_id: surveyorId
     }, function(response) {
-        if (response.trim() === 'success') {
+        const trimmedResponse = response.trim();
+        
+        // Handle different response types
+        if (trimmedResponse.startsWith('success')) {
+            // Parse success response: "success|newCount|limit"
+            const parts = trimmedResponse.split('|');
+            const newCount = parts[1] || '?';
+            const limit = parts[2] || '?';
+            
+            // Show success notification
+            showSuccessNotification(`Surveyor added successfully! Team: ${newCount}/${limit}`);
+            
+            // Reload the modal
             reloadTeamModal(projectId);
+            
+        } else if (trimmedResponse.startsWith('team_full')) {
+            // Parse team_full response: "team_full|currentCount|limit"
+            const parts = trimmedResponse.split('|');
+            const currentCount = parts[1] || '?';
+            const limit = parts[2] || '?';
+            
+            // Show styled error message
+            showTeamFullError(currentCount, limit);
+            
+        } else if (trimmedResponse === 'surveyor_not_available') {
+            showErrorNotification('This surveyor is no longer available');
+            reloadTeamModal(projectId);
+            
         } else {
-            alert('Error adding surveyor to project');
+            showErrorNotification('Error adding surveyor to project');
         }
     }).fail(function() {
-        alert('Error adding surveyor. Please try again.');
+        showErrorNotification('Connection error. Please try again.');
+    }).always(function() {
+        // Re-enable button
+        $(addButton).prop('disabled', false).html('<i class="fas fa-plus"></i> Add');
     });
+}
+
+// Show professional team full error
+function showTeamFullError(currentCount, limit) {
+    const errorModal = `
+        <div id="teamFullModal" class="land-modal" style="display: block;">
+            <div class="land-modal-content" style="max-width: 450px;">
+                <div class="land-modal-header" style="background: #dc3545; color: white; padding: 15px; border-radius: 8px 8px 0 0; margin: -20px -20px 20px -20px;">
+                    <h3 style="margin: 0; color: white;">
+                        <i class="fas fa-exclamation-triangle"></i> Team Capacity Reached
+                    </h3>
+                </div>
+                <div class="land-modal-body text-center" style="padding: 20px;">
+                    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                        <p style="margin: 0; font-size: 14px; color: #856404;">
+                            <i class="fas fa-info-circle"></i> The project team is currently at full capacity.
+                        </p>
+                    </div>
+                    <div style="font-size: 32px; color: #dc3545; margin: 15px 0;">
+                        <strong>${currentCount} / ${limit}</strong>
+                    </div>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+                        You cannot add more surveyors unless you remove existing team members or contact the admin to increase the team size limit.
+                    </p>
+                    <button type="button" class="btn-modal-primary" onclick="closeModal('teamFullModal')" style="background: #dc3545;">
+                        <i class="fas fa-check"></i> Understood
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if any
+    $('#teamFullModal').remove();
+    
+    // Append and show
+    $('body').append(errorModal);
+    $('body').css('overflow', 'hidden');
 }
 
 // Remove surveyor from project
@@ -1457,13 +1530,14 @@ function showSuccessNotification(message) {
             position: 'fixed',
             top: '20px',
             right: '20px',
-            background: '#4caf50',
+            background: 'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)',
             color: 'white',
             padding: '15px 25px',
-            borderRadius: '5px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
             zIndex: 10000,
-            display: 'none'
+            display: 'none',
+            fontWeight: '500'
         });
     
     $('body').append(notification);
@@ -1472,7 +1546,7 @@ function showSuccessNotification(message) {
     });
 }
 
-// Show error notification
+// Enhanced error notification
 function showErrorNotification(message) {
     const notification = $('<div>')
         .addClass('error-notification')
@@ -1481,13 +1555,14 @@ function showErrorNotification(message) {
             position: 'fixed',
             top: '20px',
             right: '20px',
-            background: '#dc3545',
+            background: 'linear-gradient(135deg, #dc3545 0%, #e57373 100%)',
             color: 'white',
             padding: '15px 25px',
-            borderRadius: '5px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(220, 53, 69, 0.3)',
             zIndex: 10000,
-            display: 'none'
+            display: 'none',
+            fontWeight: '500'
         });
     
     $('body').append(notification);

@@ -23,18 +23,22 @@ $sql = "SELECT DATE_FORMAT(maintenance_date, '%Y-%m') as month, SUM(total_cost) 
 $result = mysqli_query($con, $sql);
 while($row = mysqli_fetch_assoc($result)){
     $index = array_search($row['month'], $months);
-    if($index !== false) $amounts['Maintenance'][$index] = $row['amount'];
+    if($index !== false) $amounts['Maintenance'][$index] = floatval($row['amount']);
 }
 
-// Salaries
-$sql = "SELECT DATE_FORMAT(date_paid, '%Y-%m') as month, SUM(amount) as amount
-        FROM salary_payment
-        WHERE YEAR(date_paid) = $year
-        GROUP BY month";
-$result = mysqli_query($con, $sql);
-while($row = mysqli_fetch_assoc($result)){
-    $index = array_search($row['month'], $months);
-    if($index !== false) $amounts['Salaries'][$index] = $row['amount'];
+// Salaries from Contracts (calculate for each month)
+for($i = 1; $i <= 12; $i++) {
+    $month_start = sprintf('%d-%02d-01', $year, $i);
+    $month_end = date('Y-m-t', strtotime($month_start)); // Last day of month
+    
+    $sql = "SELECT COALESCE(SUM(salary), 0) as total_salary
+            FROM contract
+            WHERE start_date <= '$month_end'
+              AND end_date >= '$month_start'";
+    
+    $result = mysqli_query($con, $sql);
+    $row = mysqli_fetch_assoc($result);
+    $amounts['Salaries'][$i-1] = floatval($row['total_salary']);
 }
 
 // Equipment
@@ -45,7 +49,7 @@ $sql = "SELECT DATE_FORMAT(date, '%Y-%m') as month, SUM(cost) as amount
 $result = mysqli_query($con, $sql);
 while($row = mysqli_fetch_assoc($result)){
     $index = array_search($row['month'], $months);
-    if($index !== false) $amounts['Equipment'][$index] = $row['amount'];
+    if($index !== false) $amounts['Equipment'][$index] = floatval($row['amount']);
 }
 
 // Return JSON
