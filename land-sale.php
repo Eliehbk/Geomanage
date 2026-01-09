@@ -299,20 +299,13 @@ Cancel
             </div>
 
             <!-- Location -->
-            <div class="col-lg-3 col-md-6 padding-15">
-              <div class="filter-group">
-                <label>Location</label>
-                <select class="form-control filter-select" name="location" id="location">
-                  <option value="">All Locations</option>
-                  <option value="north">North District</option>
-                  <option value="downtown">Downtown Area</option>
-                  <option value="rural">Rural Area</option>
-                  <option value="lakeview">Lakeview Area</option>
-                  <option value="industrial">Industrial Park</option>
-                  <option value="suburban">Suburban District</option>
-                </select>
-              </div>
-            </div>
+<div class="col-lg-3 col-md-6 padding-15">
+  <div class="filter-group">
+    <label>Location</label>
+    <input type="text" class="form-control" name="location" id="location" placeholder="Enter town or area">
+  </div>
+</div>
+
 
             <!-- Price Range -->
             <div class="col-lg-3 col-md-6 padding-15">
@@ -378,7 +371,7 @@ $query = "
             FROM land_photos 
             WHERE listing_id = ll.listing_id
         )
-    WHERE ll.approval_status = 'Approved'
+    WHERE ll.approval_status = 'Approved'AND ll.status !='sold'
 ";
 
 // Add filters
