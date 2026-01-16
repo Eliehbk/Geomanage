@@ -1,383 +1,361 @@
-# 🌍 GeoManage – Enterprise Geo Management System
+# 🌍 GeoManage – Enterprise Surveying & Land Management System
 
-> A full-stack web application for managing geospatial data, maintenance workflows, and land operations with automated pricing and ML-based predictions.
+> A collaborative full-stack web application for surveying engineering firms to manage land operations, client services, HR workflows, and field equipment
 
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/Georges266/Geomanage.git)
-
----
-
-## 📋 Table of Contents
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Workflow Examples](#workflow-examples)
-- [Technical Highlights](#technical-highlights)
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Installation](#installation)
-- [Project Structure](#project-structure)
-- [Demo & Screenshots](#demo--screenshots)
+[![Original Repository](https://img.shields.io/badge/Original-Repository-blue)](https://github.com/Georges266/Geomanage)
 
 ---
 
-## 🎯 Overview
+## 📋 About This Fork
 
-GeoManage is a comprehensive enterprise-grade web application developed as a senior project, simulating real-world asset and land management systems used by municipalities, engineering firms, and property management companies.
+This is a fork of **GeoManage**, a senior project developed collaboratively by a team of 2 developers for a surveying engineering firm. This repository showcases **my contributions** to the system, including the complete development of the Client Portal, HR Management Module, Surveyor Field Operations, and Maintenance Technician workflows.
 
-**The system demonstrates:**
-- Complex role-based access control (7 user roles)
-- Real-time geospatial data visualization
-- Automated financial calculations with engineering formulas
-- Machine learning integration for price prediction
-- Full CRUD operations with relational database design
-- Email automation and PDF/Excel report generation
+**Original Repository**: [Georges266/Geomanage](https://github.com/Georges266/Geomanage)  
+**Team Size**: 2 Developers  
+**My Role**: Full-Stack Developer (Client Portal, HR, Surveyor & Salesperson Modules)  
+**Partner's Role**: Full-Stack Developer (Admin, Lead Engineer & Maintenance Technician)
 
 ---
 
-## ✨ Key Features
+## 🎯 Project Overview
 
-### 🔧 Service Request & Project Workflow
-- **Client-initiated requests**: Clients create service requests for their land/property needs with document upload
-- **Automatic pricing**: System calculates service cost instantly using engineering formulas
-- **Admin oversight**: 
-  - View service requests with auto-calculated prices (editable if needed)
-  - Access all documents and land information
-  - Visualize request location on interactive map (land location, routes, terrain analysis)
-  - Create projects from approved service requests
-  - Assign projects to Lead Engineers with defined team size limits
-- **Lead Engineer management**:
-  - Receives assigned projects
-  - Access all documents and land information
-  - Views project details on interactive map
-  - Builds surveyor team (within admin-defined team size limit)
-  - Manages project execution
-- **Real-time visibility**: All stakeholders see project updates instantly
-- **Equipment monitoring**: Track equipment status, maintenance history, and usage across the system
+GeoManage is an enterprise-grade web application designed for surveying engineering firms to streamline land management, client service requests, employee workflows, and equipment maintenance. The system serves multiple stakeholders including clients, HR personnel, surveyors, technicians, engineers, and administrators.
 
-### 💰 Intelligent Cost Calculation
-- **Automated pricing engine** using engineering-based formulas
-- **Dynamic recalculation** when services are modified or scope changes
-- **Manual override capability** for administrative adjustments
-- **Aggregated project totals** from individual service request costs
-
-### 📊 Analytics & Reporting
-- **Financial dashboard**: Track expenses, revenue, and profit margins
-- **Expense tracking**: 
-  - Employee salaries
-  - Equipment maintenance costs
-  - New equipment purchases
-- **Multi-source revenue tracking**: Service fees + land sales commissions
-- **Exportable reports**: Generate PDF and Excel reports for stakeholders
-- **Financial analytics**: Aggregated statistics for administrative decision-making
-
-### 🗺️ Advanced Geospatial Features
-- **Interactive mapping** with Leaflet integration
-- **Route optimization**: Distance calculation, travel time estimation
-- **Terrain analysis**: Elevation data, slope calculation, area measurement
-- **Satellite imagery**: Real-world view using free map providers
-- Supports direct planning and visualization for engineering decisions
-
-### 🤖 Machine Learning Price Prediction
-- **ML model** for land price estimation based on features
-- **Decision support tool** for pricing strategy and market comparison
-- Advisory system that complements manual pricing
-
-### 📧 Client Delivery System
-- **Automated email summaries** upon project completion
-- **Detailed reports**: Land details, services performed, total costs
-- **Access control**: Paid projects → full access | Unpaid → view-only with locks
-
-### 👥 Role-Based Access Control (RBAC)
-Seven distinct user roles with granular permissions:
-- **Admin**: 
-  - Service request review and price editing
-  - Access to all documents and land information
-  - Map visualization of requests (land location, routes, analysis)
-  - Project creation from service requests
-  - Lead Engineer assignment and team size configuration
-  - Equipment monitoring and maintenance oversight
-  - Financial oversight: salary tracking, equipment purchases, maintenance costs
-  - System management
-- **Lead Engineer**: 
-  - Project assignment reception
-  - Access to all project documents and land information
-  - Map-based project visualization
-  - Surveyor team building (within size constraints)
-  - Project management and oversight
-  - Can send project completion summary to client
-- **Surveyor**: Land assessment, data collection, technical documentation, team member on projects
-- **Technician**: Service execution, maintenance work
-- **Salesperson**: Client relations, land sales
-- **HR**: User management, salary administration
-- **Client**: Service request creation with document upload, project viewing based on payment status
+**Industry Context**: Surveying Engineering Firm Operations  
+**Purpose**: Digitize and automate land assessment, service delivery, HR processes, and field operations
 
 ---
 
-## 🔄 Workflow Examples
+## 🔧 My Contributions
 
-### Complete Service Request to Project Flow
-```
-Client submits service request + documents
-              ↓
-System auto-calculates price
-              ↓
-Admin reviews:
-  • Views location on map (routes, terrain, land details)
-  • Reviews documents and land information
-  • Edits price if needed
-              ↓
-Admin creates project from request
-              ↓
-Admin assigns to Lead Engineer + sets team size limit
-              ↓
-Lead Engineer:
-  • Access documents and land information
-  • Views project on map
-  • Builds surveyor team (within limit)
-  • Manages project execution
-              ↓
-Team completes project
-              ↓
-Admin or Lead Engineer sends summary to client via email
-```
+I was responsible for developing four complete user-facing modules from database design to frontend implementation:
 
-### Financial Tracking
-```
-System tracks expenses:
-  • Employee salaries (all roles)
-  • Equipment maintenance costs
-  • New equipment purchases
+### 1. 🏘️ Client Portal & Land Marketplace
 
-System tracks revenue:
-  • Service request fees
-  • Land sales commissions
+**Client-Side Features I Built**:
 
-Admin generates financial reports (PDF/Excel)
-```
+**Features I Built**:
+- **Land Marketplace System**
+  - Clients can upload land listings for sale
+  - Interactive map tool for land boundary drawing
+  - Automatic photo generation from drawn land maps for listings
+  - Browse and search available land listings
+  
+- **Service Request Workflow**
+  - Request surveying services for owned land
+  - **Dual input methods I created**:
+    - Manual land information entry
+    - **Custom map drawing tool** that auto-calculates land metrics (area, perimeter, coordinates, elevation)
+  - Upload supporting documents
+  - Track service request status
+  
+- **ML-Powered Land Valuation**
+  - Built and integrated **machine learning model** for land price prediction
+  - Clients can estimate their land value based on features
+  - Uses engineered features from land data
+  
+- **Project Dashboard**
+  - View assigned projects and their status
+  - Access project deliverables (if payment is completed)
+  - Track service progress
+  
+- **Job Application System**
+  - Clients can apply for positions at the firm
+  - Upload CV and cover letter
+  - Track application status
+
+- **Authentication System**
+  - User registration with role assignment
+  - Secure login with session management
+
+**Technologies Used**: PHP, MySQL, JavaScript, Leaflet.js, Python (scikit-learn for ML), HTML5/CSS3
 
 ---
 
-## 💡 Technical Highlights
+### 2. 👥 HR Management Module
+
+**Features I Built**:
+- **Job Opportunity Management**
+  - Create, edit, and publish job postings
+  - Open/close positions
+  - Automatic rejection emails when positions close
+  
+- **Application Processing System**
+  - View all submitted job applications
+  - Download and review uploaded CVs
+  - **Application actions**:
+    - Hire candidates (automatically creates employee records)
+    - Reject applications (with notification)
+    - Schedule interviews
+  
+- **Interview Scheduling**
+  - Calendar-based appointment system
+  - View personal interview schedule
+  - Reschedule appointments with applicants
+  
+- **Employee Management**
+  - Promote employees to different roles
+  - Terminate employment
+  - Salary adjustments (increase/decrease)
+  - Employee directory with role-based filtering
+
+**Technologies Used**: PHP, MySQL, JavaScript, HTML5/CSS3, Session Management
+
+---
+
+### 3. 🗺️ Surveyor Field Operations Module
+
+**Features I Built**:
+- **Project Assignment Dashboard**
+  - View assigned surveying projects
+  - Access all lands within each project
+  - See all requested services per land
+  
+- **Land Data Management**
+  - Update land information based on field surveillance
+  - Input actual measurements and findings
+  - Override client-submitted data with verified information
+  
+- **Document Management**
+  - Upload missing land documentation
+  - Submit project deliverables (reports, maps, analysis)
+  - Organize files by project and land
+  
+- **Equipment Tracking**
+  - View equipment assigned to current project
+  - Real-time equipment status monitoring
+  - Request maintenance for faulty equipment
+  - Document equipment issues with descriptions
+
+**Technologies Used**: PHP, MySQL, JavaScript, File Upload Handling, HTML5/CSS3
+
+---
+
+### 4. 💼 Salesperson Module
+
+**Features I Built**:
+- **Land Sale Request Management**
+  - View all client-submitted land listings awaiting approval
+  - Review land details and marketplace listings
+  - Approve or reject land sale requests
+  
+- **Sales Processing**
+  - Mark approved lands as "Sold" when transactions complete
+  - Track sales pipeline (pending → approved → sold)
+  - Manage active land listings in the marketplace
+
+**Technologies Used**: PHP, MySQL, JavaScript, HTML5/CSS3
+
+---
+
+## 💻 Technical Implementation Highlights
 
 ### Database Design
-- **Normalized relational schema** (MySQL)
-- **Complex relationships**: Many-to-many (equipment-projects), one-to-many (users-requests)
-- **Referential integrity** with foreign key constraints
-- **Optimized queries** for performance
+- Designed relational schema for:
+  - Land listings and marketplace transactions
+  - Service requests with land associations
+  - Job postings and applications with status tracking
+  - Employee records with salary history
+  - Interview scheduling with calendar integration
+  - Equipment assignment and maintenance logs
+  - Land sale approvals and sales tracking workflow
+- Implemented foreign key constraints for data integrity
+- Optimized queries for complex joins (projects → lands → services)
 
-### Backend Engineering
-- **PHP-based MVC architecture**
-- **Server-side validation** and sanitization
-- **Session management** for authentication
-- **RESTful-style endpoints** for AJAX operations
-- **File upload handling** for bills and documents
+### Map Drawing Tool (Custom Feature)
+- Built interactive land boundary drawing tool using **Leaflet.js**
+- **Auto-calculation engine** I developed:
+  - Area calculation using polygon coordinates
+  - Perimeter measurement
+  - Center point coordinates
+  - Elevation data extraction from map APIs
+- Photo generation from map canvas for land listings
+- GeoJSON export for land boundaries
 
-### Frontend Development
-- **Responsive design** (HTML5, CSS3, vanilla JavaScript)
-- **Dynamic UI updates** without page reloads
-- **Interactive forms** with client-side validation
-- **Map integration** with event handling
-- **Modular JavaScript** for maintainability
+### Machine Learning Integration
+- Trained **regression model** for land price prediction using Python (scikit-learn)
+- Feature engineering from land characteristics (area, location, elevation, etc.)
+- PHP interface to Python model for real-time predictions
+- Model serves as decision-support tool for clients
 
-### Advanced Features
-- **Email automation** using PHP mailer
-- **PDF generation** for reports
-- **Excel export** functionality
-- **Machine learning model integration** (Python model → PHP interface)
-- **Formula-based calculations** for engineering estimates
+### File Management System
+- Secure file upload with validation (CV, land documents, deliverables)
+- Organized storage structure by user/project/type
+- Access control based on user roles and payment status
+
+### Email Automation
+- Automated notifications for:
+  - Job application status changes
+  - Interview scheduling
+  - Position closure (mass rejection emails)
+  - Service request updates
+  - Land sale approval notifications
+- Used PHPMailer for reliable email delivery
 
 ---
 
 ## 🏗️ Architecture
 
+**My Modules Follow MVC Pattern**:
 ```
-┌─────────────────────────────────────────────┐
-│          Client (Browser)                   │
-│   HTML5 | CSS3 | JavaScript | Leaflet       │
-└──────────────────┬──────────────────────────┘
-                   │ HTTP Requests
-                   ↓
-┌─────────────────────────────────────────────┐
-│          Backend (PHP)                      │
-│   • Business Logic                          │
-│   • Authentication & Authorization          │
-│   • Data Validation                         │
-│   • Email & Report Generation               │
-│   • ML Model Interface                      │
-└──────────────────┬──────────────────────────┘
-                   │ SQL Queries
-                   ↓
-┌─────────────────────────────────────────────┐
-│          Database (MySQL)                   │
-│   • Users & Roles                           │
-│   • Projects & Lands                        │
-│   • Service Requests                        │
-│   • Equipment & Bills                       │
-│   • Financial Records                       │
-└─────────────────────────────────────────────┘
+Client Request → PHP Controller → Business Logic → MySQL Database
+                      ↓
+                 View Rendering → Dynamic HTML/JS → User Interface
 ```
 
-**Data Flow:**
-1. User action triggers frontend event
-2. AJAX/Form submits to PHP endpoint
-3. PHP validates, processes business logic
-4. Database transaction executed
-5. Response returned to frontend
-6. UI updates dynamically
+**Key Design Decisions I Made**:
+- Separated land data entry (manual vs. map-based) for user flexibility
+- Centralized equipment tracking across surveyor and technician roles
+- Interview scheduling integrated with HR calendar for conflict prevention
+- ML model exposed via API endpoint for frontend integration
+- Approval workflow for land listings to ensure quality control
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack (My Work)
 
-| Layer          | Technology                    |
+| Layer | Technology |
 |----------------|-------------------------------|
-| **Backend**    | PHP 7.4+                      |
-| **Frontend**   | HTML5, CSS3, JavaScript (ES6) |
-| **Database**   | MySQL 8.0                     |
-| **Mapping**    | Leaflet.js, OpenStreetMap     |
-| **ML**         | Python (scikit-learn)         |
-| **Server**     | XAMPP (Apache + MySQL)        |
-| **Reporting**  | FPDF, PHPExcel                |
-| **Email**      | PHPMailer                     |
-| **Versioning** | Git & GitHub                  |
+| **Backend** | PHP 7.4+ |
+| **Database** | MySQL 8.0 (Schema Design) |
+| **Frontend** | HTML5, CSS3, Vanilla JavaScript |
+| **Mapping** | Leaflet.js, OpenStreetMap |
+| **ML Model** | Python (scikit-learn) |
+| **Email** | PHPMailer |
+| **File Handling** | PHP File Upload API |
+| **Authentication** | PHP Sessions |
 
 ---
 
-## ⚙️ Installation
+## 🎓 Skills Demonstrated
 
-### Prerequisites
-- PHP 7.4 or higher
-- MySQL 8.0 or higher
-- XAMPP, WAMP, or similar (Apache + MySQL)
-- Git
+Through my contributions to GeoManage, I demonstrated proficiency in:
 
-### Setup Instructions
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/Georges266/Geomanage.git
-cd Geomanage
-```
-
-2. **Database Configuration**
-   - Open phpMyAdmin at `http://localhost/phpmyadmin`
-   - Create a new database: `geomanage`
-   - Import the SQL file: `database/geomanage.sql` (if provided)
-   - Or run the schema creation script
-
-3. **Configure Database Connection**
-
-Edit the configuration file (e.g., `config/database.php`):
-```php
-<?php
-$dbHost = "localhost";
-$dbUser = "root";
-$dbPass = "";
-$dbName = "geomanage";
-?>
-```
-
-4. **Start Server**
-   - Launch XAMPP Control Panel
-   - Start **Apache** and **MySQL** modules
-   - Verify services are running
-
-5. **Access Application**
-
-Navigate to:
-```
-http://localhost/Geomanage
-```
-
-### Default Login Credentials
-```
-Admin:
-  Username: admin
-  Password: admin123
-
-(Change these immediately after first login)
-```
+- **Full-Stack Development**: End-to-end feature development from database to UI
+- **Geospatial Programming**: Interactive map tools with calculation engines
+- **Machine Learning Integration**: Model training, deployment, and web integration
+- **Database Design**: Normalized schemas with complex relationships
+- **API Development**: RESTful-style endpoints for AJAX operations
+- **File Management**: Secure upload, storage, and access control
+- **Email Automation**: Transactional emails with dynamic content
+- **Business Logic**: Workflow automation (job applications, equipment tracking)
+- **User Experience**: Dual input methods for different user preferences
 
 ---
 
-## 📁 Project Structure
+## 📁 Project Structure (My Modules)
 
 ```
 Geomanage/
-├── assets/              # CSS, JS, images
-├── config/              # Database and app configuration
-├── includes/            # Reusable PHP components
-├── models/              # Data models and ML integration
-├── views/               # Frontend pages
-├── controllers/         # Business logic handlers
-├── database/            # SQL schema and migrations
-├── uploads/             # User-uploaded files (bills, docs)
-├── reports/             # Generated PDF/Excel files
-└── README.md
+├── client/                 # Client portal pages
+│   ├── marketplace.php     # Land listings
+│   ├── request_service.php # Service requests with map tool
+│   ├── ml_valuation.php    # Land price prediction
+│   └── my_projects.php     # Project dashboard
+├── hr/                     # HR management
+│   ├── job_postings.php    # Create/manage positions
+│   ├── applications.php    # Process applications
+│   ├── schedule.php        # Interview calendar
+│   └── employees.php       # Employee management
+├── surveyor/               # Surveyor operations
+│   ├── projects.php        # Assigned projects
+│   ├── update_land.php     # Field data entry
+│   ├── deliverables.php    # Upload reports
+│   └── equipment.php       # Equipment tracking
+├── salesperson/            # Sales module
+│   ├── pending_lands.php   # Review land sale requests
+│   └── manage_sales.php    # Approve/mark as sold
+├── models/                 # ML model files
+│   └── land_price_model.pkl
+├── uploads/                # User-uploaded files
+│   ├── cvs/
+│   ├── land_docs/
+│   └── deliverables/
+└── assets/                 # CSS, JS, images
 ```
 
 ---
 
-## 📸 Demo & Screenshots
+## 🚀 Installation & Setup
 
-> **Note**: Add screenshots here showcasing:
-> - Dashboard with statistics
-> - Interactive map with land visualization
-> - Service request workflow
-> - Equipment assignment interface
-> - Financial reports
-> - Role-based views
+### Prerequisites
+- PHP 7.4+
+- MySQL 8.0+
+- XAMPP/WAMP (Apache + MySQL)
+- Python 3.8+ (for ML model)
+
+### Steps
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/[your-username]/Geomanage.git
+   cd Geomanage
+   ```
+
+2. Import database:
+   - Open phpMyAdmin (`http://localhost/phpmyadmin`)
+   - Create database: `geomanage`
+   - Import SQL file from `database/geomanage.sql`
+
+3. Configure database connection in `config/database.php`:
+   ```php
+   define('DB_HOST', 'localhost');
+   define('DB_USER', 'root');
+   define('DB_PASS', '');
+   define('DB_NAME', 'geomanage');
+   ```
+
+4. Start Apache & MySQL via XAMPP Control Panel
+
+5. Access application: `http://localhost/Geomanage`
+
 
 ---
 
-## 🎓 Learning Outcomes
 
-This project demonstrates proficiency in:
-- Full-stack web development (frontend + backend + database)
-- Software architecture and design patterns
-- Database normalization and query optimization
-- Role-based access control implementation
-- API integration (maps, ML models)
-- Financial calculation automation
-- Report generation and email automation
-- Version control and collaborative development
-- Real-world problem-solving for enterprise systems
+## 🤝 Collaboration
+
+This project was developed in partnership with **Georges266** who implemented:
+- Admin dashboard and system configuration
+- Lead Engineer project management
+- Maintenance Technician equipment workflows
+- Financial tracking and reporting
+- Automated pricing engine
+
+**Division of Work**: We split the system into user-facing modules, with clear separation of responsibilities while maintaining consistent architecture and database design.
 
 ---
 
-## 🚀 Future Enhancements
+## 🔮 Future Enhancements (Ideas)
 
-- [ ] RESTful API for mobile app integration
+- [ ] Mobile app for surveyors (offline field data collection)
+- [ ] Advanced ML models (project timeline prediction, equipment failure prediction)
 - [ ] Real-time notifications using WebSockets
-- [ ] Advanced ML models for project timeline prediction
-- [ ] Multi-language support (i18n)
+- [ ] Multi-language support for international clients
 - [ ] Cloud deployment (AWS/Azure)
-- [ ] Automated testing suite (PHPUnit)
+- [ ] API documentation for third-party integrations
 
 ---
 
-## 👨‍💻 Developer
+## 📞 Contact
 
-**Georges**  
-Senior Project | Software Engineering  
-📧 [Contact Email]  
-🔗 [LinkedIn Profile]  
-💼 [Portfolio Website]
+I'm happy to discuss my contributions, technical decisions, and the development process in detail.
+
+📧 eliehabka987@gmail.com  
+
+---
+
+## 🙏 Acknowledgments
+
+- **Project Partner**: Georges deeb - for seamless collaboration and complementary development
+- **Academic Advisors**: For guidance and feedback throughout the project
+- **Open-Source Community**: Leaflet.js, PHPMailer, and other libraries used
+
+---
+
+**⭐ If you find this project interesting or want to learn more about my approach to full-stack development, feel free to reach out!**
 
 ---
 
 ## 📄 License
 
 This project was developed as an academic senior project. Please contact for usage permissions.
-
----
-
-## 🙏 Acknowledgments
-
-Special thanks to:
-- Project advisors and mentors
-- Team members who contributed
-- Open-source community for tools and libraries
-
----
-
-**⭐ If you find this project interesting, please consider giving it a star on GitHub!**
